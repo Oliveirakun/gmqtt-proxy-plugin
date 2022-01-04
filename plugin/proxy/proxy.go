@@ -29,6 +29,13 @@ type Proxy struct {
 func (p *Proxy) Load(service server.Server) error {
 	log = server.LoggerWithField(zap.String("plugin", Name))
 	p.logger = log
+
+	apiRegistrar := service.APIRegistrar()
+	err := apiRegistrar.RegisterHTTPHandler(new(HTTPHandler).Handle)
+	if err != nil {
+		log.Error("Error registering HTTP handler")
+	}
+
 	return nil
 }
 
