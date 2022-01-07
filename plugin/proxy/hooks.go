@@ -15,9 +15,9 @@ func (p *Proxy) HookWrapper() server.HookWrapper {
 
 func (p *Proxy) OnMsgArrivedWrapper(pre server.OnMsgArrived) server.OnMsgArrived {
 	return func(ctx context.Context, client server.Client, req *server.MsgArrivedRequest) error {
-
 		message := fmt.Sprintf("Message received - Topic:  %v, Payload: %v\n", req.Message.Topic, string(req.Message.Payload))
-		p.logger.Info(message)
+		log.Info(message)
+		p.producer.Enqueue(req.Message)
 
 		return nil
 	}
