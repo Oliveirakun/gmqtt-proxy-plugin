@@ -10,11 +10,11 @@ import (
 )
 
 type HTTPHandler struct {
-	semaphore *Semaphore
+	proxy *Proxy
 }
 
-func NewHTTPHandler(s *Semaphore) *HTTPHandler {
-	return &HTTPHandler{semaphore: s}
+func NewHTTPHandler(p *Proxy) *HTTPHandler {
+	return &HTTPHandler{proxy: p}
 }
 
 func (h *HTTPHandler) Handle(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
@@ -23,9 +23,11 @@ func (h *HTTPHandler) Handle(ctx context.Context, mux *runtime.ServeMux, endpoin
 		stop := req.URL.Query().Get("stop")
 		switch stop {
 		case "true":
-			h.semaphore.Close()
+			h.proxy.closeSemaphore()
 		case "false":
-			h.semaphore.Open()
+			brokerURI := req.URL.Query().Get("broker-uri")
+			h.proxy.changeRemoteBrokerURI(brokerURI)
+			h.proxy.openSemaphore()
 		}
 
 		w.WriteHeader(http.StatusOK)

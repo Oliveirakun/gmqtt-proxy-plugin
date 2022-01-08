@@ -3,6 +3,7 @@ package proxy
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -48,7 +49,7 @@ func (p *Proxy) Load(service server.Server) error {
 	log = server.LoggerWithField(zap.String("plugin", Name))
 
 	apiRegistrar := service.APIRegistrar()
-	handler := NewHTTPHandler(p.semaphore)
+	handler := NewHTTPHandler(p)
 	err := apiRegistrar.RegisterHTTPHandler(handler.Handle)
 	if err != nil {
 		log.Error("Error registering HTTP handler")
@@ -65,13 +66,36 @@ func (p *Proxy) Name() string {
 	return Name
 }
 
+func (p *Proxy) changeRemoteBrokerURI(uri string) {
+	if len(uri) == 0 {
+		return
+	}
+
+	newClient := createMQTTClientWithURI(uri)
+	p.consumer.SetClient(newClient)
+}
+
+func (p *Proxy) openSemaphore() {
+	p.semaphore.Open()
+}
+
+func (p *Proxy) closeSemaphore() {
+	p.semaphore.Close()
+}
+
 func createMQTTClient() mqtt.Client {
 	brokerURI := os.Getenv("REMOTE_MQTT_BROKER")
-	client := mqtt.NewClient(mqtt.NewClientOptions().AddBroker(brokerURI))
+	return createMQTTClientWithURI(brokerURI)
+}
 
-	if err := client.Connect().Error(); err != nil {
+func createMQTTClientWithURI(uri string) mqtt.Client {
+	client := mqtt.NewClient(mqtt.NewClientOptions().AddBroker(uri))
+
+	t := client.Connect()
+	if err := t.Error(); err != nil {
 		log.Error(fmt.Sprintf("Failed connecting to broker: %v", err))
 	}
 
+	t.WaitTimeout(10 * time.Second)
 	return client
 }
