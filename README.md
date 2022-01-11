@@ -46,8 +46,24 @@ mv gmqtt-proxy-plugin proxy
 go get github.com/eclipse/paho.mqtt.golang
 ```
 
-6. Run the project:
+6. Export an environment variable with the destination broker uri:
+
+```shell
+export REMOTE_MQTT_BROKER=tcp://127.0.0.1:1884
+```
+
+7. Run the project:
 
 ```shell
 make run
 ```
+## Routes
+
+Route | Description
+------------ | -------------
+**v1/toogle?stop=true** | Stop sending messages to destination broker
+**v1/toogle?stop=false** | Restart sending messages to destination broker
+**v1/toogle?stop=false&broker-uri=tcp://127.0.0.1** | Restart sending messages to a different broker
+
+
+
