@@ -1,5 +1,5 @@
 # gmqtt-proxy-plugin
-It's a plugin created for [Gmqtt broker](https://github.com/DrmagicE/gmqtt), to make it act like a proxy, with messages buffering support when the destination broker is down.
+It's a plugin created for [Gmqtt broker](https://github.com/DrmagicE/gmqtt), to make it act like a mqtt proxy, with messages buffering support when the destination broker is down.
 
 ## How to install
 
