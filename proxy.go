@@ -89,7 +89,12 @@ func createMQTTClient() mqtt.Client {
 }
 
 func createMQTTClientWithURI(uri string) mqtt.Client {
-	client := mqtt.NewClient(mqtt.NewClientOptions().AddBroker(uri))
+	options := mqtt.NewClientOptions()
+	options.ConnectRetry = true
+	options.ConnectTimeout = 10 * time.Second
+	options.ConnectRetryInterval = 2 * time.Second
+
+	client := mqtt.NewClient(options.AddBroker(uri))
 
 	t := client.Connect()
 	if err := t.Error(); err != nil {
