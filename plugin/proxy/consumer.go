@@ -41,6 +41,7 @@ func (c *Consumer) DequeueMessagesAndSendToBroker() {
 	for {
 		if c.semaphore.IsOpen() {
 			message := c.dequeue()
+			time.Sleep(200 * time.Millisecond)
 			c.sendToBroker(message)
 		}
 	}
