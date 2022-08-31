@@ -66,4 +66,6 @@ Route | Description
 **/v1/toogle?stop=false&broker-uri=tcp://127.0.0.1** | Restart sending messages to a different broker
 
 
+## LICENSE
 
+Licensed under MIT, see [LICENSE](LICENSE.md)
